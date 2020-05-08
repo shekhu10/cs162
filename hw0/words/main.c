@@ -44,9 +44,18 @@ WordCount *word_counts = NULL;
  * Returns the total amount of words found in infile.
  * Useful functions: fgetc(), isalpha().
  */
-int num_words(FILE* infile) {
-  int num_words = 0;
 
+int num_words(FILE *infile){
+  int num_words = 0;
+  int c = fgetc(infile);
+  int prev = c;
+  while (c != EOF){
+    c = fgetc(infile);
+    if (!isalpha(tolower(c)) && isalpha(prev)){
+      num_words += 1;
+    }
+    prev = c;
+  }
   return num_words;
 }
 
@@ -56,7 +65,61 @@ int num_words(FILE* infile) {
  * Given infile, extracts and adds each word in the FILE to `wclist`.
  * Useful functions: fgetc(), isalpha(), tolower(), add_word().
  */
+
+
 void count_words(WordCount **wclist, FILE *infile) {
+  char *word = (char *) malloc(MAX_WORD_LEN + 1);
+  char c;
+  int cur_len = 0;
+  do {
+    c = fgetc(infile);
+    if (isalpha(c) != 0) {
+      c = tolower(c);
+      if (cur_len < MAX_WORD_LEN) {
+        word[cur_len] = c;
+        cur_len += 1;
+      } else if (cur_len == MAX_WORD_LEN) {
+        word[cur_len] = '\0';
+        add_word(wclist, word);
+        word[0] = c;
+        cur_len = 1;
+      }
+    } else if (cur_len >= 1) {
+      word[cur_len] = '\0';
+      add_word(wclist, word);
+      cur_len = 0;
+    } 
+  } while (c != EOF);
+}
+void count_words1(WordCount **wclist, FILE *infile) {
+  // void add_word(WordCount **wclist, char *word);
+  // char *word = (char *) malloc(MAX_WORD_LEN + 1);
+  char *curr_word = (char *) malloc(MAX_WORD_LEN + 1);
+  int c = fgetc(infile);
+  int prev = c;
+  int curr_pos = 0;
+  while (c != EOF){
+    c = fgetc(infile);
+    if (!isalpha(tolower(c)) && isalpha(tolower(prev))){
+      // word finished 
+      curr_word[curr_pos] = '\0';
+      curr_pos = 0;
+      add_word(wclist, curr_word);
+    }
+    // word going on // isalpha prev // do it every time so no "else if"
+    if (isalpha(prev)){
+      curr_word[curr_pos++] = tolower(prev);
+    }
+    prev = c;
+  }
+  // after while complete c = eof and prev may be alpha
+  // so check prev, insert prev and \0 and add word in cnt
+  if (isalpha(prev)){
+    curr_word[curr_pos++] = tolower(prev);
+    curr_word[curr_pos] = '\0';
+    add_word(wclist, curr_word);
+    curr_pos = 0;
+  } 
 }
 
 /*
@@ -64,7 +127,16 @@ void count_words(WordCount **wclist, FILE *infile) {
  * Useful function: strcmp().
  */
 static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
-  return 0;
+  if (wc1->count < wc2->count){
+    return true;
+  }
+  if (wc1->count == wc2->count){
+      return strcmp(wc1-> word, wc2->word) < 0 ? true : false;
+  }
+  else{
+    return false;
+  }
+
 }
 
 // In trying times, displays a helpful message.
@@ -131,6 +203,40 @@ int main (int argc, char *argv[]) {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
     // found at argv[argc-1].
+    for (int i = optind; i < argc; i++){
+      infile = fopen(argv[i], "r");
+
+      if (infile == NULL){
+        printf("%s", "Error Opening File");
+      }
+      else if (count_mode){
+        total_words += num_words(infile);
+      }
+      else if (freq_mode){
+        count_words(&word_counts, infile);
+      }
+    }
+
+
+    /*
+    for (int i = optind; i < argc; ++i) {
+      infile = fopen(argv[i], "r");
+      if (infile == NULL) {
+        printf("%s", "Error opening file");
+      } else {
+        if (count_mode) {
+          total_words += num_words(infile);
+        } else {
+          count_words(&word_counts, infile);
+        }
+        fclose(infile);
+      }
+    }
+    */
+
+
+
+
   }
 
   if (count_mode) {

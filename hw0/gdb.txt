@@ -1,63 +1,110 @@
 GDB Practice:
 
-a.
+a. Run GDB
+	gdb map
 
-b.
+b. Set a breakpoint at the beginning of the program’s execution
+	break map.c:main
 
-c.
+c. Run the program until the breakpoint
+	run
 
-d.
+d. Where does argv point to?
+	print argv
 
-    *
+e. What’s at the address of argv?
+	print &argv
 
-e.
+f. Step until you reach the first call to recur.
+	// --> next takes me to the next line of the current function (let say main)
+    // even if it is a function call, it will run the function (and all function calls, if it is recursive)
+    // and the take me to next line
+    // --> step takes me into the function call if it is a function call on the next line
+    // --> in layout src --> the line which is selected is the line which is to be executed next
+    next or n
+    next or n
 
-    *
+g. What is the memory address or the recur function?
+	print recur or p recur
 
-f.
+h. Step into the first call to recur.
+	s
 
-g.
+i. Step until you reach the if statement
+	next
 
-    *
+j. Switch into assembly view
+	layout asm
 
-h.
+k. Step over instructions until you reach the ‘callq‘ instruction
+	next
+    next
 
-i.
+l. What values are in all the registers?
+	info r
 
-j.
+m. Step into the call instruction
+	step
 
-k.
+n. Switch back to C code mode.
+	layout src
+	
+o. Now print out the current call stack (hint: what does the backtrace command do?)
+	backtrace
 
-l.
+p. Now set a breakpoint on the recur function which is only triggered when the argument is 0
+	break recur if i == 0
+    // note i is the argument in the code
 
-    *
+q. Continue until the breakpoint is hit
+	continue or c
 
-m.
+r. Print the call stack now
+	backtrace
 
-n.
+s. Now go up the call stack until you reach main, what was argc?
+	up
+    print argc
 
-o.
+t. Now step until the return statement
+	break 12 or break recurse.c:12
 
-p.
+u. Switch back into the assembly view
+    layout asm
 
-q.
+v. Which instructions correspond to the ‘return 0‘ in C?
 
-r.
+    // 3 instruction make up return 0 is x86
+    mov
+    leaveq
+    retq
 
-s.
+w. Now switch back to the source layout.
+    layout src
 
-t.
+x.  Finish the next 3 function calls
 
-u.
 
-v.
+y. Run the program to completion.
+    continue or c
 
-    *
+z. Quit gdb
+    quit
 
-w.
 
-x.
 
-y.
 
-z.
+register --> r
+print --> p
+next --> n
+step --> s
+break --> b
+
+
+break for asm
+// this way --> find the address by seeing via layout asm
+// then break *memory_address
+
+// in asm--> 
+// si and ni are used for step instruction and next instruction
+// and next and step continue as in src mode even in asm mode

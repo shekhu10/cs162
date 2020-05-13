@@ -1,4 +1,67 @@
-the problem was that the default c (with no argv) code was creating a pointer to the executable file..
+
+1.	gcc -g asuna.c -o asuna
+
+2.	gdb ./asuna
+
+3.	run
+	seg fault at line 20. This means the problem is here
+
+4. break asuna.c:20
+	set breakpoint at 20
+
+5. backtrace
+	found 3 frames
+
+6. kill
+
+// restart again
+1.	run "this is the argument"
+	running with the argument -- "this is the argument"
+
+2.	as breakpt was already set program exec. paused there.
+	now start examining...
+
+3.	backtrace
+	found 3 frames again
+
+4.	info locals
+	looks no prob here
+
+5.	print a[l]
+	print a[r]
+	looks no problem here
+
+6.	print a
+	looks no problem here
+
+7. continue
+
+//line 20 does read and write in 'a'
+so in 1 case it is able to do it (when argv is passed) and 1 case it is not able to this
+so there must be some memory problem as no other local looks problematic
+
+
+
+// restart again
+1.	run
+	seg fault at line 20. This means the problem is here
+
+2. break asuna.c:20
+	set breakpoint at 20
+
+3. backtrace
+	found 3 frames
+
+4.	print a[l]
+	print a[r]
+	looks no problem here
+
+5.	print a
+// PROBLEM FOUND -- the address of 'a' (when argument was not passed) is much lower than that of 'a' (when argument was passed). This means that may be the 'a' (when no argument was passed) is pointing in the static area.
+Seeing code it is verified. 
+
+Conclusion - 
+The problem was that the default c (with no argv) code was creating a pointer to the executable file (static area)..
 And executable code is read only code. So either create the 'a' in the stack frame or in the heap memory
 
 char a[] = "this is me"     //stack frame

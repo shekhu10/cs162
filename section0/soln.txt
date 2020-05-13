@@ -1,0 +1,8 @@
+the problem was that the default c (with no argv) code was creating a pointer to the executable file..
+And executable code is read only code. So either create the 'a' in the stack frame or in the heap memory
+
+char a[] = "this is me"     //stack frame
+
+char *a = new malloc(100);      // heap memory
+strcpy(a, "this is me");
+free(a);

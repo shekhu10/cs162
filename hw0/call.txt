@@ -1,18 +1,68 @@
-1.
+Note - Naming of files (order of execution)
+  
+  01. gcc -m32 -c recurse.c -o recurse.obj
 
-2.
+  02. gcc -m32 -c map.c -o map.obj
 
-3.
+  03. objdump -D map.obj     
+  			// this is to see object file as it is binary file
+  
+  04. objdump -D map.obj > map_objdump
+  
+  05. objdump -D recurse.obj > recurse_objdump
+  
+  06. objdump -t map.obj 	
+  			// this is to see object file as it is binary file
+  
+  07. objdump -t map.obj > symbol_map
+  
+  08. objdump -t recurse.obj > symbol_recurse
+  
+  09. gcc -m32 map.obj recurse.obj -o map_final 
+  			// this is to link the obj files, map_final is an executable file which executes fine
+  10. ./map_final 
+  
+  11. objdump -t map_final 
+  			// symbol table of final linked file
 
-4
 
-5.
+1. Generate recurse.S and find which instruction(s) corresponds to the recursive call of recur(i-1)
+		gcc -m32 -S -o map.S map.c
+		call instruction at line 44
 
-6.
+2. What do the .text and .data section contain?
+		.text -> this section contains instructions of the executable program.
+		.data -> this section contains the initialized data of the executable program.
 
-7.
+3. What command do we use to view the symbols in an ELF file?
+	objdump -t *.obj
 
-8.
+4. What do the g, O, F, and *UND* flags mean?
+		l = local
+		g = global 
+		d = debug
+		f = file
+		O = object
+		F = function
+		*UND* = external varible or function
 
-9.
+5. Vaguely describe another location where we can find the symbol for malloc.
+		malloc -> this function is defined in stdlib.h
+		So, malloc must be defined in symbol table of stdlib.h
+
+6. Where else can we find a symbol for recur? Which file is this in? Copy and paste the relevant portion of the symbol table.
+		00000000 g     F .text	00000052 recur
+		We can find it in the symbol table of recurse.obj. F = function
+
+7. Examine the symbol table of the entire map program now. What has changed?
+		-malloc is still undefined as stdlib.h is not linked
+		-both the symbol tables of map.obj and recurse.obj has been linked
+		-compiler gives the address of 0 to UND Variables, but linker patches them and give accurate address
+		-Linker output is complete and self-sufficient.
+
+
+		Linker executes in three passes:
+		Pass 1: read in section sizes, compute final memory layout.
+		Pass 2: read in all symbols, create complete symbol table in memory.
+		Pass 3: read in section and relocation information, update addresses, write out new file.
 

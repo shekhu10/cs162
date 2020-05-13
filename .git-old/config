@@ -1,9 +1,0 @@
-[core]
-	repositoryformatversion = 0
-	filemode = true
-	bare = false
-	logallrefupdates = true
-[branch "master"]
-[remote "personal"]
-	url = https://github.com/shekhu10/cs162.git
-	fetch = +refs/heads/*:refs/remotes/personal/*
